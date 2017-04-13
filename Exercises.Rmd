@@ -1,0 +1,156 @@
+---
+title: "Exercise 2.8"
+author: "Partha S Satpathy"
+date: "April 10, 2017"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Library fma
+
+```{r fma,echo=TRUE}
+library(fma)
+data(package='fma')
+```
+
+```{r ex1a,echo=TRUE}
+##Exercise 1a
+##Data is dole- 'Unemployment benefits in Australia'
+##Monthly total of people on unemployed benefits in Australia (January 1956–July 1992).
+print(dole)
+plot(dole/1000,xlab="Year",ylab="Monthly Total of People in Thousands",main="Unemployment benefits in Australia")
+```
+
+```{r ex1b,echo=TRUE}
+##Exercise 1b
+##Monthly total of accidental deaths in the United States (January 1973–December 1978).
+##Data- usdeaths
+print(usdeaths)
+plot(usdeaths,xlab="Year",ylab="Accidental Deaths in USA",main="Monthly total of accidental deaths in the United States")
+
+```
+```{r ex1c,echo=TRUE}
+##Exercise 1c
+##bricksq- Quaterly Production of Brick in Australia
+print(bricksq)
+plot(bricksq,xlab="Year",ylab="No of Bricks in million",main="Quaterly Production of Brick in Australia")
+
+```
+```{r ex2a,echo=TRUE}
+##Exercise 2a
+print(dowjones)
+ts.plot(dowjones,ylab="Dow Jones Index")
+```
+```{r ex2b,echo=TRUE}
+##Exercise 2b
+rwf(dowjones, h=42, drift=TRUE)
+plot(rwf(dowjones, h=42, drift=TRUE),main="Drift Forecast for Down Jones index")
+#segments()
+```
+```{r ex2c,echo=TRUE}
+##Exercise 2c
+plot(rwf(dowjones, h=42, drift=TRUE),main="Drift Forecast for Down Jones index")
+segments(1,110.94,78,121.23,col = "red")
+```
+
+```{r ex2d,echo=TRUE}
+##Exercise 2d
+#train = window(dowjones,start=c(1),end=c(60))
+fMean = meanf(dowjones,42)
+fNaive = naive(dowjones,42)
+fSnaive = snaive(dowjones,42)
+fDrift = rwf(dowjones, h=42, drift=TRUE)
+plot(dowjones,main="Drift Forecast for Down Jones index")
+lines(fMean$mean,col=2)
+lines(fNaive$mean,col=3)
+lines(fSnaive$mean,col=4)
+lines(fDrift$mean,col=6)
+legend("topleft",lty=1,col=c(2,3,4,6),
+  legend=c("Mean method","Naive method","Seasonal naive method","Drift Method"))
+
+#test = window(dowjones,start=c(61))
+accuracy(fMean)
+accuracy(fNaive)
+accuracy(fSnaive)
+accuracy(fDrift)
+
+##The Drift method works best as it has the least error
+
+```
+
+```{r ex3a,echo=TRUE}
+##Exercise 3a
+print(ibmclose)
+plot(ibmclose,xlab="Days",ylab="Stock Price",main="IBM Stock Price")
+
+```
+
+```{r ex3b,echo=TRUE}
+##Exercise 3b
+train_ibmclose = window(ibmclose,start=1,end = 300)
+test_ibmclose = window(ibmclose,start=301)
+print(train_ibmclose)
+print(test_ibmclose)
+```
+
+```{r ex3c,echo=TRUE}
+##Exercise 3b
+train_ibmclose = window(ibmclose,start=1,end = 300)
+test_ibmclose = window(ibmclose,start=301)
+
+fMean = meanf(train_ibmclose,h=42)
+fNaive = naive(train_ibmclose,h=42)
+fSnaive = snaive(train_ibmclose,h=42)
+fdrift = rwf(train_ibmclose,h=42,drift = T)
+
+plot(train_ibmclose,xlab="Days",ylab="Stock Price",main="IBM Stock Price")
+lines(fMean$mean,col=2)
+lines(fNaive$mean,col=3)
+lines(fSnaive$mean,col=4)
+lines(fdrift$mean,col=5)
+legend("bottomleft",lty=1,col=c(2,3,4,5),
+       legend=c("Mean method","Naive method","Seasonal naive method","Drift Method"))
+print(accuracy(fMean,test_ibmclose))
+print(accuracy(fNaive,test_ibmclose))
+print(accuracy(fSnaive,test_ibmclose))
+print(accuracy(fdrift,test_ibmclose))
+```
+
+```{r ex4a,echo=TRUE}
+##Exercise 4a
+print(hsales)
+plot(hsales,main="Sales of new family in USA")
+
+```
+
+```{r ex4b,echo=TRUE}
+train_hsales = window(hsales,start=c(1973,1),end=c(1993,12))
+test_hsales = window(hsales,start=c(1994,1))
+```
+
+```{r ex4c,echo=TRUE}
+fMean = meanf(train_hsales,h=42)
+fNaive = naive(train_hsales,h=42)
+fSnaive = snaive(train_hsales,h=42)
+fdrift = rwf(train_hsales,h=42,drift = T)
+
+plot(train_hsales,xlab="Days",ylab="Stock Price",main="IBM Stock Price")
+lines(fMean$mean,col=2)
+lines(fNaive$mean,col=3)
+lines(fSnaive$mean,col=4)
+lines(fdrift$mean,col=5)
+legend("topright",lty=1,col=c(2,3,4,5),
+       legend=c("Mean method","Naive method","Seasonal naive method","Drift Method"))
+print(accuracy(fMean,test_hsales))
+print(accuracy(fNaive,test_hsales))
+print(accuracy(fSnaive,test_hsales))
+print(accuracy(fdrift,test_hsales))
+
+##SNaive works best as it has the least test error
+```
+
+
