@@ -1,5 +1,5 @@
 ---
-title: "Exercise 2.8"
+title: "Homework 1"
 author: "Partha S Satpathy"
 date: "April 10, 2017"
 output: word_document
@@ -17,7 +17,10 @@ library(fma)
 data(package='fma')
 ```
 
-```{r ex1a,echo=TRUE}
+## Exercise 2.8
+
+
+```{r 28ex1a,echo=TRUE}
 ##Exercise 1a
 ##Data is dole- 'Unemployment benefits in Australia'
 ##Monthly total of people on unemployed benefits in Australia (January 1956–July 1992).
@@ -25,7 +28,7 @@ print(dole)
 plot(dole/1000,xlab="Year",ylab="Monthly Total of People in Thousands",main="Unemployment benefits in Australia")
 ```
 
-```{r ex1b,echo=TRUE}
+```{r 28ex1b,echo=TRUE}
 ##Exercise 1b
 ##Monthly total of accidental deaths in the United States (January 1973–December 1978).
 ##Data- usdeaths
@@ -33,31 +36,31 @@ print(usdeaths)
 plot(usdeaths,xlab="Year",ylab="Accidental Deaths in USA",main="Monthly total of accidental deaths in the United States")
 
 ```
-```{r ex1c,echo=TRUE}
+```{r 28ex1c,echo=TRUE}
 ##Exercise 1c
 ##bricksq- Quaterly Production of Brick in Australia
 print(bricksq)
 plot(bricksq,xlab="Year",ylab="No of Bricks in million",main="Quaterly Production of Brick in Australia")
 
 ```
-```{r ex2a,echo=TRUE}
+```{r 28ex2a,echo=TRUE}
 ##Exercise 2a
 print(dowjones)
 ts.plot(dowjones,ylab="Dow Jones Index")
 ```
-```{r ex2b,echo=TRUE}
+```{r 28ex2b,echo=TRUE}
 ##Exercise 2b
 rwf(dowjones, h=42, drift=TRUE)
 plot(rwf(dowjones, h=42, drift=TRUE),main="Drift Forecast for Down Jones index")
 #segments()
 ```
-```{r ex2c,echo=TRUE}
+```{r 28ex2c,echo=TRUE}
 ##Exercise 2c
 plot(rwf(dowjones, h=42, drift=TRUE),main="Drift Forecast for Down Jones index")
 segments(1,110.94,78,121.23,col = "red")
 ```
 
-```{r ex2d,echo=TRUE}
+```{r 28ex2d,echo=TRUE}
 ##Exercise 2d
 #train = window(dowjones,start=c(1),end=c(60))
 fMean = meanf(dowjones,42)
@@ -82,14 +85,14 @@ accuracy(fDrift)
 
 ```
 
-```{r ex3a,echo=TRUE}
+```{r 28ex3a,echo=TRUE}
 ##Exercise 3a
 print(ibmclose)
 plot(ibmclose,xlab="Days",ylab="Stock Price",main="IBM Stock Price")
 
 ```
 
-```{r ex3b,echo=TRUE}
+```{r 28ex3b,echo=TRUE}
 ##Exercise 3b
 train_ibmclose = window(ibmclose,start=1,end = 300)
 test_ibmclose = window(ibmclose,start=301)
@@ -97,7 +100,7 @@ print(train_ibmclose)
 print(test_ibmclose)
 ```
 
-```{r ex3c,echo=TRUE}
+```{r 28ex3c,echo=TRUE}
 ##Exercise 3b
 train_ibmclose = window(ibmclose,start=1,end = 300)
 test_ibmclose = window(ibmclose,start=301)
@@ -120,19 +123,19 @@ print(accuracy(fSnaive,test_ibmclose))
 print(accuracy(fdrift,test_ibmclose))
 ```
 
-```{r ex4a,echo=TRUE}
+```{r 28ex4a,echo=TRUE}
 ##Exercise 4a
 print(hsales)
 plot(hsales,main="Sales of new family in USA")
 
 ```
 
-```{r ex4b,echo=TRUE}
+```{r 28ex4b,echo=TRUE}
 train_hsales = window(hsales,start=c(1973,1),end=c(1993,12))
 test_hsales = window(hsales,start=c(1994,1))
 ```
 
-```{r ex4c,echo=TRUE}
+```{r 28ex4c,echo=TRUE}
 fMean = meanf(train_hsales,h=42)
 fNaive = naive(train_hsales,h=42)
 fSnaive = snaive(train_hsales,h=42)
@@ -151,6 +154,222 @@ print(accuracy(fSnaive,test_hsales))
 print(accuracy(fdrift,test_hsales))
 
 ##SNaive works best as it has the least test error
+```
+
+
+## Exercise 4.10
+
+```{r 410ex1a,echo=TRUE}
+mwh <- c(16.3,16.8,15.5,18.2,15.2,17.5,19.8,19.0,17.5,16.0,19.6,18.0)
+temp <- c(29.3,21.7,23.7,10.4,29.7,11.9,9.0,23.4,17.8,30.0,8.6,11.8)
+econsumtion <- data.frame(cbind(mwh,temp))
+names(econsumtion) <- c('Mwh','Temp')
+attach(econsumtion)
+
+plot(Mwh~Temp)
+fit <- lm(Mwh~Temp)
+summary(fit)
+lines(Temp,predict(fit))
+```
+
+```{r 410ex1b,echo=TRUE}
+plot(residuals(fit)~Temp)
+
+##1. The R square value is 0.62 which shows that it is not a good fit
+##2. There are outliers present as can be seen from the Residual plot
+```
+
+```{r 410ex1c,echo=TRUE}
+#library('fma')
+#fitted(fit)[1]
+forecast(fit,newdata = data.frame(Temp=c(10,35)))
+```
+
+```{r 410ex1d,echo=TRUE}
+fcast <- forecast(fit,newdata = data.frame(Temp=c(10,35)))
+fcast
+```
+
+```{r 410ex2a,echo=TRUE}
+head(olympic)
+year <- c(2000,2004,2008,2012,2016)
+time <- c(43.18,43.18,43.02,42.58,42.50)
+newrec <- data.frame(cbind(year,time))
+names(newrec)=c('Year','time')
+olympic <- rbind(olympic,newrec)
+```
+
+```{r 410ex2b,echo=TRUE}
+attach(olympic)
+plot(olympic$time~olympic$Year)
+
+##The sctterplot shows that olympic record time is decreasing linearly with each year
+
+```
+
+```{r 410ex2c,echo=TRUE}
+fit <- lm(time ~ Year, data = olympic)
+plot(olympic$time~olympic$Year)
+lines(Year,predict(fit))
+print(fit$coefficients[2])
+##The rate of dcreasing can be found from the slope of the regression lines
+##which is here --- -0.07002136
+```
+
+```{r 0ex2d,echo=TRUE}
+plot(residuals(fit)~Year)
+##There is no pattern on the residuals. This shows that the model is fit.
+```
+
+```{r 410ex2e,echo=TRUE}
+forecast(fit,newdata = data.frame(Year=c(2000,2004,2008,2010)))
+```
+
+```{r 410ex2f,echo=TRUE}
+##The real data for years 2000,2004,2008,2010 are as follows:
+## 2000 43.18
+## 2004 43.18
+## 2008 43.02
+## 2012 42.58
+#This is very near to the expectations
+```
+
+## Exercise 5.8
+
+```{r ex1a,echo=TRUE}
+print(fancy)
+plot(fancy/1000,ylab="Sales in Thousands",main="Sales of the Shop 1987-1994")
+
+##There is a spike in sales in December of every month.
+##After 1988, there is a spike in sales in March every year
+
+##Fluctuations- In 1993, there is a very high increase in sales
+```
+
+```{r ex1b,echo=TRUE}
+##We need to take log of the time series before modelling, because that will make the 
+##time series stable. That removes the fluctiations in seasonality.
+```
+
+```{r ex1c,echo=TRUE}
+fancy_log <- log(fancy)
+dummy_data = rep(0, length(fancy))
+dummy_data[seq_along(dummy_data)%%12 == 3] <- 1
+dummy_data[3] <- 0
+dummy_data <- ts(dummy_data, freq = 12, start=c(1987,1))
+fancy_newdata <- data.frame(fancy_log,dummy_data)
+
+sales_fit <- tslm(fancy_log ~ trend + season + dummy_data, data=fancy_newdata)
+
+future_data <- data.frame(dummy_data = rep(0, 12))
+future_data[3,] <- 1
+
+forecast(sales_fit, newdata=future_data)
+```
+
+```{r ex1e,echo=TRUE}
+plot(residuals(sales_fit), type='p')
+plot(as.numeric(fitted(sales_fit)), residuals(sales_fit), type='p')
+```
+
+```{r ex1f,echo=TRUE}
+boxplot(resid(sales_fit) ~ cycle(resid(sales_fit)))
+```
+
+```{r ex1g,echo=TRUE}
+library('lmtest')
+dwtest(sales_fit, alt="two.sided")
+```
+
+```{r ex1h,echo=TRUE}
+future_data <- data.frame(dummy_data = rep(0, 36))
+
+pred_sales <- forecast(sales_fit, newdata=future_data)
+pred_sales
+
+```
+
+```{r ex1i,echo=TRUE}
+sales_df <- as.data.frame(pred_sales)
+sales_df <- exp(sales_df)
+sales_df
+
+```
+
+```{r ex2a,echo=TRUE}
+texasgas_df <- (texasgas)
+plot(texasgas_df$price, texasgas_df$consumption , xlab = "Price", ylab = "Consumption")
+```
+
+```{r e2b,echo=TRUE}
+##The data is not linear. Slope should be changed.
+```
+
+
+```{r ex2c,echo=TRUE}
+texasgas_fit <- lm(consumption ~ exp(price), texasgas_df)
+
+summary(texasgas_fit)
+(summary(texasgas_fit)$sigma)**2 
+
+##Piecewise Linear Regression
+texasgas_lin <- lm(consumption ~ price, texasgas_df)
+library(segmented)
+segmented.mod <- segmented(texasgas_lin, seg.Z = ~price, psi=60)
+
+slope(segmented.mod)
+
+##Residual 
+(summary(segmented.mod)$sigma)**2 
+
+##Polynomial Regression
+texasgas_poly <- lm(consumption ~ poly(price, 2), texasgas_df)
+
+##Residual variance
+texasgas_poly <- lm(consumption ~ poly(price, 2), texasgas_df)
+```
+
+```{r ex2d,echo=TRUE}
+summary(texasgas_fit)
+
+AIC(texasgas_fit)
+
+resiplot_1 <- residuals(texasgas_fit)
+plot(texasgas_fit$fitted.values, resiplot_1, ylab='residuals', xlab='fitted values',main='linear regression')
+abline(0,0)
+
+#piecewise linear regression
+
+summary(texasgas_lin)
+
+AIC(texasgas_lin)
+resiplot_2 <- residuals(segmented.mod)
+plot(segmented.mod$fitted.values, resiplot_2, ylab='residuals', xlab='fitted values', main='piecewise linear regression')
+abline(0,0)
+
+#polynomial regression.
+
+summary(texasgas_poly)
+AIC(texasgas_poly)
+
+resiplot_3 <- residuals(texasgas_poly)
+plot(texasgas_poly$fitted.values, resiplot_3, ylab='residuals', xlab='fitted values',main='polynomial linear regression')
+abline(0,0)
+```
+
+```{r ex2e,echo=TRUE}
+new_data <- data.frame(price=c(40, 60, 80, 100, 120))
+predict(segmented.mod, new_data)
+
+texasgas_new <- seq(min(new_data), max(new_data), length.out=5)
+intervals <- predict(segmented.mod, new_data, interval="predict")
+intervals
+
+plot(consumption ~ price, data = texasgas_df, type = 'n')
+
+polygon(c(rev(texasgas_new), texasgas_new), c(rev(intervals[ ,3]), intervals[ ,2]), col = 'pink', border = NA)
+
+
 ```
 
 
