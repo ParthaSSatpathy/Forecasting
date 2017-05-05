@@ -1,0 +1,446 @@
+---
+title: "HomeWork 2"
+author: "Partha S Satpathy"
+date: "May 3, 2017"
+output:
+  word_document: default
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r lib,echo=TRUE}
+library(fma)
+library(fpp)
+library(segmented)
+```
+
+Ex 6 -Q1
+
+ma3x5 = 1/3[1/5(yt-3 + yt-2 + yt-1 + yt + yt+1) 
+            + 1/5(yt-2 + yt-1 + yt + yt+1 + yt+2) 
+            + 1/5(yt-1 + yt + yt+1 + yt+2 + yt+3)]
+      = 1/15yt-3 +  2/15 yt-2 + 3/15yt-1 + 3/15yt + 3/15yt+1 + 2/15 yt+2 + 1/15yt+3
+      = 0.067yt-3 +  0.13 yt-2 + 0.2 yt-1 + 0.2 yt + 0.2 yt+1 + 0.13 yt+2 + 0.067 yt+3
+      = ma7 with weights [0.067, 0.133, 0.200, 0.200, 0.200, 0.133,0.06]
+
+```{r ex6.2a,echo=TRUE}
+#head(plastics)
+plastics
+
+plot(plastics)
+
+##Trend- Positive Upward
+##Seasonality - Increase with Summer and decreases when winter
+
+```
+
+```{r ex6.2b,echo=TRUE}
+fit <- decompose(plastics, type="multiplicative")
+
+trend_indices <- fit$trend
+seasonal_indices <- fit$seasonal
+
+
+```
+
+```{r ex6.2c,echo=TRUE}
+plot(fit)
+
+##Yes its showing the interpretation of a. The trend is positive and seasonality is present with summer and winter.
+```
+
+```{r ex6.2d,echo=TRUE}
+plot(plastics, col="grey",
+ main="Plastic manufacturing",
+  xlab="", ylab="Monthly Sales")
+lines(seasadj(fit),col="red",ylab="Seasonally adjusted")
+
+```
+
+```{r ex6.2e,echo=TRUE}
+ts <- plastics
+ts[10] = ts[10] + 500
+
+fit2 <- decompose(ts, type="multiplicative")
+plot(ts, col="grey",
+ main="Plastic manufacturing",
+  xlab="", ylab="Monthly Sales")
+lines(seasadj(fit),col="red",ylab="Seasonally adjusted")
+
+#The outlier put a spike on the graph
+```
+```{r 6.2f,echo=TRUE}
+
+ts <- plastics
+ts[30] = ts[30] + 500
+
+fit2 <- decompose(ts, type="multiplicative")
+plot(ts, col="grey",
+ main="Plastic manufacturing",
+  xlab="", ylab="Monthly Sales")
+lines(seasadj(fit),col="red",ylab="Seasonally adjusted")
+
+ts <- plastics
+ts[51] = ts[51] + 500
+
+fit2 <- decompose(ts, type="multiplicative")
+plot(ts, col="grey",
+ main="Plastic manufacturing",
+  xlab="", ylab="Monthly Sales")
+lines(seasadj(fit),col="red",ylab="Seasonally adjusted")
+
+##There is no diference wherever the outlier is. It shows as a spike everywhere.
+
+```
+```{r ex6.2g,echo=TRUE}
+fit2 <- stl(elecequip, t.window=15, s.window="periodic", robust=TRUE)
+eeadj <- seasadj(fit2)
+plot(eeadj)
+fit3 <- rwf(eeadj,drift=TRUE)
+plot(fit3, ylab="Forecast Plastic Production")
+```
+
+```{r ex6.2h,echo=TRUE}
+fcast <- forecast(fit2, method="rwdrift")
+plot(fcast, ylab="Production")
+```
+
+Ex 6, Q-3,a
+Seasonally adjusted series contain the remainder component as well as the trend-cycle. Therefore they are not “smooth” and “downturns” or “upturns” can be misleading. If the purpose is to look for turning points in the series, and interpret any changes in the series, then it is better to use the trend-cycle component rather than the seasonally adjusted data.
+
+Ex6, Q-3.b
+The 1991-92 recession is particularly visible in the remainder aph. We can also see the same in the overall Data. However, there is no change in the
+trend and seasinality.
+
+
+----------------------------------------------------------------------------------------------------------------------------
+##Exercise 7
+```{r ex7.1a,echo=TRUE}
+print(books)
+plot(books)
+```
+
+```{r ex7.1b,echo=TRUE}
+paper <- books[,1]
+
+alpha <- seq(0,1,0.05)
+sse <- 0
+
+for (i in 1:21){
+  print(i)
+  fit <- ses(paper, initial='simple', alpha=alpha[i], h=3)
+  fitsse <- sum((paper - fitted(fit))) 
+  sse <- c(sse,fitsse)
+}
+alpha
+sse
+
+plot(alpha[5:21],sse[5:21],type = 'l')
+
+##The minimum error is coming for alpha = 0.75
+
+```
+
+```{r ex7.1c,echo=TRUE}
+fit1 <- ses(paper, initial='simple', h=4)
+fit2 <- ses(paper, initial='simple', alpha=0.75, h=4)
+par(mfrow=c(2,1))
+plot(fit1, main="Automatic alpha")
+plot(fit2, main="Custom alpha: 0.75")
+```
+
+```{r ex7.1d,echo=TRUE}
+fit1 <- ses(paper, initial='optimal', h=4)
+sum((paper - fitted(fit1))) 
+
+fit2 <- ses(paper, initial='simple', alpha=0.75, h=4)
+sum((paper - fitted(fit2))) 
+
+par(mfrow=c(2,1))
+plot(fit1, main="Optimal alpha")
+plot(fit2, main="Custom alpha: 0.75")
+
+##Optimal is not an improvement. It's sse is too high.
+```
+
+```{r ex7.1e,echo=TRUE}
+hardcover <- books[,2]
+
+alpha <- seq(0,1,0.05)
+sse <- 0
+
+for (i in 1:21){
+  #print(i)
+  fit <- ses(hardcover, initial='simple', alpha=alpha[i], h=3)
+  fitsse <- sum((hardcover - fitted(fit))) 
+  sse <- c(sse,fitsse)
+}
+alpha
+sse
+
+plot(alpha[5:21],sse[5:21],type = 'l')
+
+optAlpha <- 1 ##As found from the graph
+##----------------------------
+
+fit1 <- ses(hardcover, initial='simple', h=4)
+fit2 <- ses(hardcover, initial='simple', alpha=0.75, h=4)
+par(mfrow=c(2,1))
+plot(fit1, main="Automatic alpha")
+plot(fit2, main="Custom alpha: 0.75")
+##----------------------------
+fit1 <- ses(hardcover, initial='optimal', h=4)
+sum((hardcover - fitted(fit1))) 
+
+fit2 <- ses(hardcover, initial='simple', alpha=0.75, h=4)
+sum((hardcover - fitted(fit2))) 
+
+par(mfrow=c(2,1))
+plot(fit1, main="Optimal alpha")
+plot(fit2, main="Custom alpha: 0.75")
+
+##Optimal Alpha works best
+
+
+```
+```{r ex7.2a,echo=TRUE}
+fit1 <- holt(paper, alpha=0.8, beta=0.2, initial="simple", h=5) 
+sum((paper - fitted(fit1))) 
+fit2 <- holt(paper, alpha=0.8, beta=0.2, initial="simple", exponential=TRUE, h=5)
+sum((paper - fitted(fit2))) 
+
+##Exponential smoothing works better than the normal one
+```
+```{r ex7.2b,echo=TRUE}
+
+plot(paper)
+lines(fitted(fit1), col="blue") 
+lines(fitted(fit2), col="red")
+lines(fit1$mean, col="blue", type="o") 
+lines(fit2$mean, col="red", type="o")
+
+fit1 <- holt(hardcover, alpha=0.8, beta=0.2, initial="simple", h=5) 
+sum((hardcover - fitted(fit1))) 
+fit2 <- holt(hardcover, alpha=0.8, beta=0.2, initial="simple", exponential=TRUE, h=5)
+sum((hardcover - fitted(fit2))) 
+plot(hardcover)
+lines(fitted(fit1), col="blue") 
+lines(fitted(fit2), col="red")
+lines(fit1$mean, col="blue", type="o") 
+lines(fit2$mean, col="red", type="o")
+```
+```{r ex7.2c,echo=TRUE}
+fit1$upper[,2] - fit1$lower[,2]
+fit2$upper[,2] - fit2$lower[,2]
+
+#Exponential method works better as the 95% interval is smaller
+```
+
+```{r ex7.3a,echo=TRUE}
+cars_data <- ukcars
+plot(cars_data, main="Quarterly UK passenger vehicle production ", xlab="Year", ylab="Number of vehicles")
+
+```
+
+```{r ex7.3b,echo=TRUE}
+decomposed <- stl(cars_data, s.window="periodic", robust=TRUE)
+seasonal <- decomposed$time.series[,1]
+
+cars_seasonal <- cars_data - seasonal
+
+```
+
+```{r ex7.3c,echo=TRUE}
+fit_1 <- holt(cars_seasonal, h=8, damped = TRUE)
+
+lastyear <- rep(decomposed$time.series[110:113,"seasonal"],2)
+reseasonalized_fc1 <- fit_1$mean + lastyear
+
+summary(fit_1)
+
+```
+```{r ex7.3d,echo=TRUE}
+fit_2 <- holt(cars_seasonal, h=8)
+
+reseasonalized_fc2 <- fit_2$mean + lastyear
+
+summary(fit_2)
+
+```
+
+```{r ex7.3e,echo=TRUE}
+fit_3 <- ets(cars_seasonal)
+fit_3
+```
+
+```{r ex7.3f,echo=TRUE}
+summary(fit_1)
+summary(fit_2)
+summary(fit_3)
+```
+
+```{r ex7.3g,echo=TRUE}
+pred_3 <- predict(fit_3)
+plot(pred_3, main="STL decomposition with Holt's method", xlab="Year", ylab="Number of vehicles")
+
+pred_2 <- predict(fit_2)
+plot(pred_2, main="Holt's linear method", xlab="Year", ylab="Number of vehicles")
+
+pred_1 <- predict(fit_1)
+plot(pred_1, main="Additive damped trend method", xlab="Year", ylab="Number of vehicles")
+
+```
+```{r ex7.4,echo=TRUE}
+visitor_data <- visitors
+plot(visitor_data, main="Monthly Australian short-term overseas visitors", xlab="Year", ylab="Number of visitors")
+
+Forecast_twoyears <- hw(visitor_data, h=24, seasonal='multiplicative')
+plot(Forecast_twoyears, main="Holt-Winters' multiplicative method", xlab="Year", ylab="Number of visitors")
+
+Forecast_twoyears1 <- hw(visitors, h=24, seasonal='multiplicative', damped=TRUE)
+plot(Forecast_twoyears1, main="damped", xlab="Year", ylab="Number of visitors")
+
+Forecast_twoyears2 <- hw(visitors, h=24, seasonal='multiplicative', exponential=TRUE)
+plot(Forecast_twoyears2, main="exponential", xlab="Year", ylab="Number of visitors")
+
+plot(Forecast_twoyears,ylab="Monthly Australian visitors", plot.conf=FALSE,
+     fcol="white", xlab="Year")
+lines(fitted(Forecast_twoyears), col="red", lty=2)
+lines(fitted(Forecast_twoyears1), col="green", lty=2)
+lines(fitted(Forecast_twoyears2), col='blue', lty=2)
+lines(Forecast_twoyears$mean, type="o", col="red")
+lines(Forecast_twoyears1$mean, type="o", col="green")
+lines(Forecast_twoyears2$mean, type="o", col="blue")
+
+vis_fit1 <- holt(visitor_data, seasonal='multiplicative')
+vis_fit2 <- ets(visitor_data)
+
+```
+
+##Exercise 8.11
+```{r ex8.5,echo=TRUE}
+#a
+n <- ts(numeric(100))
+e<- rnorm(100)
+for(i in 2:100)
+  n[i] <- 0.6*n[i-1] + e[i]
+
+#b
+plot(n, main="time series", xlab="time")
+sim.data.arl <- function(n.obs, phi, seed.nr){
+  set.seed(seed.nr)
+  a <- ts(numeric(n.obs))
+  e <- rnorm(n.obs)
+  for (i in 2:n.obs)
+    a[i] <- phi*a[i-1] + e[i]
+  return(a)
+}
+plot(sim.data.arl(100, 0.9, 2), main= "time series", xlab="times")
+lines(sim.data.arl(100, 0.9, 2), col="blue")
+
+#c
+sim.data.mal <- function(n.obs, theta, seed.nr){
+  set.seed(seed.nr)
+  a <- ts(numeric(n.obs))
+  e <- rnorm(n.obs)
+  for (i in 2:n.obs)
+    a[i] <- theta*a[i-1] + e[i]
+  return(a)
+}
+
+#d
+plot(sim.data.mal(100, 0.6, 2), main="time series", xlab="time")
+
+#e
+sim.data.armal1 <- function(n.obs, theta, seed.nr){
+  set.seed(seed.nr)
+  a <- ts(numeric(n.obs))
+  e <- rnorm(n.obs)
+  for (i in 2:n.obs)
+    a[i] <- phi*a[i-1] + theta*e[i-1] + e[i]
+  return(a)
+}
+
+#f
+sim.data.ar2 <- function(n.obs, phi1, phi2, seed.nr){
+  set.seed(seed.nr)
+  a <- ts(numeric(n.obs))
+  e <- rnorm(n.obs)
+  for(i in 3: n.obs)
+    a[i] <- phi1*a[i-1] + phi2*a[i-2] + e[i]
+  return(a)
+}
+plot(sim.data.ar2(100, -0.9, 0.3, 2), main="timeseries", xlab="time")
+
+  
+```
+```{r ex8.6,echo=TRUE}
+#a
+data(wmurders)
+tsdisplay(wmurders)
+
+wmurders.d1 <- diff(wmurders)
+tsdisplay(wmurders.d1)
+
+adf.test(wmurders.d1)
+kpss.test(wmurders.d1)
+
+wmurders.d2 <- diff(diff(wmurders))
+tsdisplay(wmurders.d2)
+
+adf.test(wmurders.d2)
+kpss.test(wmurders.d2)
+
+fit <- Arima(wmurders, order=c(0, 1, 2))
+tsdisplay(residuals(fit), lag.max=20)
+
+Box.test(residuals(fit), lag=24, fitdf=4, type="Ljung")
+
+##As the test shows that the residual is only White Noise, we can conclude that ARIMA is the best model.
+
+#b
+#A constant will bring drift which we do not have. So, we will not use constant.
+
+##c
+#(1−B)(1−Bm)yt=(1−B−Bm+Bm+1)yt=yt−yt−1−yt−m+yt−m−1
+
+##d
+fit <- Arima(wmurders, order=c(0, 1, 2))
+tsdisplay(residuals(fit), lag.max=20)
+
+##e
+fcast <- forecast(fit, h=3)
+fcast$mean
+## Time Series:
+## Start = 2005 
+## End = 2007 
+## Frequency = 1 
+## [1] 2.458450 2.477101 2.477101
+toforecast <- 3
+yt <- fit$x
+et <- fit$residuals
+theta1 <- as.numeric(fit$coef['ma2'])
+theta2 <- as.numeric(fit$coef['ma1'])
+
+for (h in 1:toforecast){
+  n <- length(yt)
+  y_tp1 <- 2 * yt[n] - yt[n - 1] + theta1 * et[n] + theta2 * et[n - 1]
+  yt <- c(yt, y_tp1)
+  et <- c(et, 0)}
+
+f <- yt[(length(yt) - toforecast + 1):length(yt)]
+plot(fcast)
+lines(fit$x - fit$residuals, col='blue')
+points(c(2005, 2006, 2007), f, col='red')
+
+##f
+plot(fcast)
+
+##g
+auto.arima(wmurders)
+
+```
+
